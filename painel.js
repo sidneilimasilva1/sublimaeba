@@ -137,7 +137,7 @@ async function telaLogin(){
       sess={token,repo:c.repo,branch:c.branch||'main',usuario:c.usuario};SS.set('sublimae_admin',sess);fechar();entrarAdmin();aviso('Modo admin ligado. Toque em ✏️ nos produtos para editar.')}
     catch(e){falha(e===0?'Usuário ou senha errados.':(e.message||'Não deu certo.'));b.disabled=false}});
   s.addEventListener('keydown',e=>{if(e.key==='Enter')b.click()});
-  botao('Primeira vez? Configurar o painel','link',()=>{fechar();telaConfigurar()})}
+  const cx=caixa;lerConfig().then(c=>{if(!c&&caixa===cx&&cx.isConnected)botao('Primeira vez? Configurar o painel','link',()=>{fechar();telaConfigurar()})})}
 function repoProvavel(){const h=location.hostname,m=h.match(/^([^.]+)\.github\.io$/i);if(!m)return'';const seg=location.pathname.split('/').filter(Boolean)[0];
   return m[1]+'/'+(seg&&!/\.html?$/i.test(seg)?seg:h)}
 async function testarChave(repo,token){const r=await gh('/repos/'+repo,{},token);if(r.status===404)throw new Error('Não achei o repositório "'+repo+'" com essa chave. Confira o nome e se a chave tem acesso a ele.');
@@ -147,6 +147,7 @@ async function salvarConfig(repo,branch,usuario,senha,token){
   const atual=await lerArquivo('admin.json',cred);await gravar('admin.json',txt64(JSON.stringify(c,null,1)),'Configura o painel de admin',atual&&atual.sha,cred);
   LS.set('sublimae_admin_cfg',c);sess={token,repo,branch,usuario};SS.set('sublimae_admin',sess)}
 async function telaConfigurar(){
+  if(await lerConfig()){telaLogin();return}
   janela('Configurar o painel');
   if(semCripto()){caixa.appendChild(el('p','pm-sub','Abra o catálogo pelo link do site (https) para configurar.'));return}
   caixa.appendChild(el('p','pm-sub','Feito só uma vez. A chave fica guardada no repositório, trancada com a senha que você criar aqui.'));
