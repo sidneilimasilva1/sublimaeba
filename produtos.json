@@ -1,0 +1,19 @@
+{
+ "atualizado": 1793481610664,
+ "categorias": [
+  "Política"
+ ],
+ "produtos": {
+  "CAM-002": {
+   "titulo": "Camiseta Políticas",
+   "cat": "Política",
+   "preco": "consulte",
+   "precoTexto": "R$ 40,00 cada",
+   "desc": "Personalização conforme arte, nome, foto ou tema escolhido.",
+   "selo": "lancamento",
+   "foto": "fotos/CAM-002-1793481608448.webp",
+   "criado": 1793481610663
+  }
+ },
+ "removidos": []
+}
