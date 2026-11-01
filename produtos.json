@@ -1,5 +1,5 @@
 {
- "atualizado": 1793481610664,
+ "atualizado": 1793572489682,
  "categorias": [
   "Política"
  ],
@@ -15,5 +15,7 @@
    "criado": 1793481610663
   }
  },
- "removidos": []
+ "removidos": [
+  "CHA-001"
+ ]
 }
