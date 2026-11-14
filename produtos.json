@@ -1,5 +1,5 @@
 {
- "atualizado": 1794676387462,
+ "atualizado": 1794676549601,
  "categorias": [
   "Política",
   "Calendário"
@@ -34,6 +34,16 @@
    "selo": "novo",
    "foto": "fotos/CAN-061-1794676384999.webp",
    "criado": 1794676387462
+  },
+  "BODY-002": {
+   "titulo": "Body Infantil Natalino",
+   "cat": "Vestuário",
+   "preco": 40,
+   "precoTexto": "",
+   "desc": "Personalização conforme arte, nome, foto ou tema escolhido.",
+   "selo": "lancamento",
+   "foto": "fotos/BODY-002-1794676547598.webp",
+   "criado": 1794676549601
   }
  },
  "removidos": [
