@@ -1,5 +1,5 @@
 {
- "atualizado": 1794675751310,
+ "atualizado": 1794676387462,
  "categorias": [
   "Política",
   "Calendário"
@@ -24,6 +24,16 @@
    "selo": "novo",
    "foto": "fotos/CAL-001-1794675748591.webp",
    "criado": 1794675751309
+  },
+  "CAN-061": {
+   "titulo": "Canecas Natalinas",
+   "cat": "Personalizadas",
+   "preco": 50,
+   "precoTexto": "",
+   "desc": "Personalização conforme arte, nome, foto ou tema escolhido.",
+   "selo": "novo",
+   "foto": "fotos/CAN-061-1794676384999.webp",
+   "criado": 1794676387462
   }
  },
  "removidos": [
