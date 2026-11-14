@@ -1,7 +1,8 @@
 {
- "atualizado": 1793572489682,
+ "atualizado": 1794675751310,
  "categorias": [
-  "Política"
+  "Política",
+  "Calendário"
  ],
  "produtos": {
   "CAM-002": {
@@ -13,6 +14,16 @@
    "selo": "lancamento",
    "foto": "fotos/CAM-002-1793481608448.webp",
    "criado": 1793481610663
+  },
+  "CAL-001": {
+   "titulo": "Calendário com Imã",
+   "cat": "Calendário",
+   "preco": "consulte",
+   "precoTexto": "Kit c/ 25 R$ 30,00",
+   "desc": "Personalização conforme arte, nome, foto ou tema escolhido.",
+   "selo": "novo",
+   "foto": "fotos/CAL-001-1794675748591.webp",
+   "criado": 1794675751309
   }
  },
  "removidos": [
