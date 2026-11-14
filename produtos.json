@@ -1,5 +1,5 @@
 {
- "atualizado": 1794676651622,
+ "atualizado": 1794676782543,
  "categorias": [
   "Política",
   "Calendário"
@@ -44,6 +44,16 @@
    "selo": "lancamento",
    "foto": "fotos/BODY-002-1794676547598.webp",
    "criado": 1794676549601
+  },
+  "BOL-001": {
+   "titulo": "Bola Natalina em MDF",
+   "cat": "Coleção Natal",
+   "preco": "consulte",
+   "precoTexto": "Kit c/ 5 R$ 20,00",
+   "desc": "Personalização conforme arte, nome, foto ou tema escolhido.",
+   "selo": "novo",
+   "foto": "fotos/BOL-001-1794676779939.webp",
+   "criado": 1794676782543
   }
  },
  "removidos": [
