@@ -142,7 +142,7 @@ img[data-art]:not([src]){visibility:hidden}
         <div class="arl" id="arts"></div>
         <div class="g"><div><label>Situação da validação</label><select id="aps"><option value="pendente">Arte ainda não enviada ao cliente</option><option value="enviada">Enviada, aguardando cliente</option><option value="ajustes">Cliente pediu ajustes</option><option value="aprovada">Aprovada pelo cliente</option><option value="liberada">Liberada sem validação</option></select></div><div><label>Aprovado por</label><input id="app"></div><div><label>Data da aprovação</label><input id="apd" type="date"></div></div>
         <div><label>Ajustes pedidos ou como o cliente confirmou</label><textarea id="apn" rows="2" placeholder="Ex.: cliente respondeu APROVADO no WhatsApp"></textarea></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" id="bVal">Pedir validação pelo WhatsApp</button><button type="button" id="bOk" class="pri">✓ Cliente aprovou</button></div></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><label style="display:flex;align-items:center;gap:6px;color:var(--ink);font-size:14px;width:100%"><input type="checkbox" id="sinalChk" style="width:auto"> Pedir <span id="sinalTxt">50% de sinal</span> junto na mensagem</label><button type="button" id="bVal">Pedir validação pelo WhatsApp</button><button type="button" id="bOk" class="pri">✓ Cliente aprovou</button></div></div>
       <div><label>Observações de produção (arte, referências, embalagem)</label><textarea id="obs" rows="2"></textarea></div>
       <div class="tot"><span>Subtotal: <b id="tSub">R$ 0,00</b></span><span>Total: <b id="tTot">R$ 0,00</b></span><span>Falta receber: <b id="tRes">R$ 0,00</b></span></div>
     </div>
@@ -172,7 +172,7 @@ img[data-art]:not([src]){visibility:hidden}
   <details id="rec-cfg"><summary style="cursor:pointer;color:var(--cya);font-weight:600">Formas de pagamento e mensagem do recibo (configure uma vez)</summary>
     <div class="g" style="margin-top:8px"><div><label>Chave PIX</label><input id="rc-pix" placeholder="CPF, celular, e-mail ou chave aleatória"></div><div><label>Nome de quem recebe o PIX</label><input id="rc-tit" placeholder="Nome que aparece no banco"></div></div>
     <div><label>Outras formas de pagamento (uma por linha)</label><textarea id="rc-out" rows="3"></textarea></div>
-    <div><label>Mensagem no final do recibo</label><input id="rc-msg"></div>
+    <div class="g"><div><label>Mensagem no final do recibo</label><input id="rc-msg"></div><div><label>Sinal antecipado (%)</label><input id="rc-sin" type="number" min="0" max="100" step="5"></div></div>
     <button type="button" id="rc-save" style="margin-top:6px">Salvar</button></details>
 </div>
 <div class="mf" style="flex-wrap:wrap"><button type="button" id="rec-img">Enviar imagem do recibo</button><button type="button" id="rec-pr">Imprimir / PDF</button><button class="pri" type="button" id="rec-wa">Enviar pelo WhatsApp</button></div></dialog>
@@ -287,7 +287,7 @@ function match(p){const q=$("busca").value.trim().toLowerCase();if(!q)return tru
 function card(p){const z=prazo(p);
  return `<div class="ord"><h3><span>${E(p.cliente)}</span><span class="n">#${p.num}</span></h3>
  <div class="dots" title="${ST[p.status]}">${ST.map((x,k)=>`<i class="${k<=p.status?"f":""}"></i>`).join("")}</div>
- <span class="tag ${z.c}">${z.t}</span><span class="tag">${p.tipo}</span>${apTag(p)}${bxTag(p)}${res(p)>0?`<span class="tag">Falta ${R(res(p))}</span>`:`<span class="tag ok">Pago</span>`}${p.recibo?`<span class="tag ok">Recibo enviado</span>`:""}
+ <span class="tag ${z.c}">${z.t}</span><span class="tag">${p.tipo}</span>${apTag(p)}${bxTag(p)}${res(p)>0?`<span class="tag">Falta ${R(res(p))}</span>`:`<span class="tag ok">Pago</span>`}${p.recibo?`<span class="tag ok">Recibo enviado</span>`:""}${p.sinal&&(+p.pago||0)<p.sinal.valor&&p.status<4?`<span class="tag soon">Sinal pedido: ${R(p.sinal.valor)}</span>`:""}
  <ul>${p.itens.map(i=>`<li>${i.qtd}× ${E(i.nome)} <em>${E(i.cod)}${i.var?" • "+E(i.var):""}</em>${i.obs?`<br><em>${E(i.obs)}</em>`:""}</li>`).join("")}</ul>
  ${p.obs?`<div class="empty" style="padding:0 0 4px">${E(p.obs)}</div>`:""}${thumbs(p)}
  <div class="acts">${p.status>0?`<button data-a="back" data-id="${p.id}" title="Voltar etapa">←</button>`:""}${p.status<4?`<button class="pri" data-a="next" data-id="${p.id}">${["Arte aprovada","Iniciar produção","Marcar pronto","Entregue",""][p.status]}</button>`:""}
@@ -356,7 +356,7 @@ async function imprimir(h){$("sheet").innerHTML=h;await hydrate($("sheet"));wind
 $("bPrintQ").onclick=()=>imprimir(`<div class="pg"><div style="display:flex;align-items:center;gap:10px"><img src="${LG()}" style="height:48px" alt=""><h1>Fila de produção • ${new Date().toLocaleDateString("pt-BR")}</h1></div>${queueHtml()}</div>`);
 
 document.addEventListener("click",e=>{const lb=e.target.closest("[data-lb]");if(lb){abrirArte(lb.dataset.lb);return}const b=e.target.closest("[data-a]");if(b){const p=D.pedidos.find(x=>x.id==b.dataset.id);if(!p)return;const a=b.dataset.a;
- if(a=="next")avancar(p);else if(a=="apr")aprovar(p);else if(a=="val")pedirVal(p);else if(a=="back")voltar(p);else if(a=="bx"){if(baixar(p)){save();render()}}else if(a=="edit")open_(p);else if(a=="print")imprimir(ficha(p));else if(a=="wa")wa(p);else if(a=="rec")abrirRecibo(p);return}
+ if(a=="next")avancar(p);else if(a=="apr")aprovar(p);else if(a=="val")pedirVal(p);else if(a=="back")voltar(p);else if(a=="bx"){if(baixar(p)){save();render()}}else if(a=="edit")open_(p);else if(a=="print")imprimir(ficha(p));else if(a=="wa")wa(p);else if(a=="rec")abrirRecibo(p);else if(a=="sinalok"){p.pago=Math.max(+p.pago||0,p.sinal.valor);save();render();toast("Sinal de "+R(p.sinal.valor)+" registrado como pago.")}return}
  const t=e.target.closest(".tabs button");if(t){tab=t.dataset.t;render()}});
 $("busca").addEventListener("input",render);
 $("bBackup").onclick=async()=>{const imgs={};for(const p of D.pedidos)for(const a of p.artes||[]){const b=await idb("readonly",s=>s.get(a.id));if(b)imgs[a.id]=await new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(b)})}
@@ -376,7 +376,9 @@ function thumbs(p,s=46){const a=p.artes||[];if(!a.length)return"";return `<span 
 function apTag(p){if(p.status>=3)return"";const e=(p.aprov&&p.aprov.estado)||"pendente",n=(p.artes||[]).length;
  if(!n&&e=="pendente")return `<span class="tag soon">Sem arte anexada</span>`;
  const m={pendente:["soon","Arte não enviada ao cliente"],enviada:["soon","Aguardando cliente"],ajustes:["late","Cliente pediu ajustes"],aprovada:["ok","✓ Arte aprovada"],liberada:["","Liberada sem validação"]}[e];return `<span class="tag ${m[0]}">${m[1]}</span>`}
-function aprBtns(p){if(p.status>=2||liberado(p)||!(p.artes||[]).length)return"";return `<button data-a="val" data-id="${p.id}">Pedir validação</button><button data-a="apr" data-id="${p.id}">✓ Cliente aprovou</button>`}
+function aprBtns(p){return sinalBtn(p)+aprBtns0(p)}
+const sinalBtn=p=>p.sinal&&(+p.pago||0)<p.sinal.valor&&p.status<4?`<button data-a="sinalok" data-id="${p.id}">✓ Sinal recebido</button>`:"";
+function aprBtns0(p){if(p.status>=2||liberado(p)||!(p.artes||[]).length)return"";return `<button data-a="val" data-id="${p.id}">Pedir validação</button><button data-a="apr" data-id="${p.id}">✓ Cliente aprovou</button>`}
 function avancar(p){if(proximo(p)){save();render()}}
 function proximo(p){if(p.status<2&&!liberado(p)){const n=(p.artes||[]).length;
  if(!confirm(n?"O cliente ainda não validou a arte deste pedido.\n\nLiberar para produção mesmo assim?":"Este pedido não tem arte anexada nem validação do cliente.\n\nLiberar para produção mesmo assim?"))return false;
@@ -384,11 +386,11 @@ function proximo(p){if(p.status<2&&!liberado(p)){const n=(p.artes||[]).length;
  if(p.status==1&&!p.baixa&&!baixar(p))return false;
  p.status++;return true}
 function aprovar(p){p.aprov={estado:"aprovada",por:p.cliente,data:hoje(),nota:(p.aprov&&p.aprov.nota)||""};save();render();toast("Aprovação do cliente registrada.")}
-function waVal(cli,tel,num){const d=tel.replace(/\D/g,"");if(!d){toast("Informe o WhatsApp do cliente para pedir a validação.");return false}
- window.open("https://wa.me/"+(d.length<=11?"55"+d:d)+"?text="+encodeURIComponent(`Olá, ${cli}! Segue a arte${num?" do pedido #"+num:""} para a sua validação. Confira nomes, frases, cores e fotos. Responda *APROVADO* para liberarmos a impressão ou nos diga os ajustes. Depois da aprovação não conseguimos alterar a arte.`),"_blank");
+function waVal(cli,tel,num,sinal){const d=tel.replace(/\D/g,"");if(!d){toast("Informe o WhatsApp do cliente para pedir a validação.");return false}
+ window.open("https://wa.me/"+(d.length<=11?"55"+d:d)+"?text="+encodeURIComponent(`Olá, ${cli}! Segue a arte${num?" do pedido #"+num:""} para a sua validação. Confira nomes, frases, cores e fotos. Responda *APROVADO* para liberarmos a impressão ou nos diga os ajustes. Depois da aprovação não conseguimos alterar a arte.`+(sinal>0?txtSinal(sinal):"")),"_blank");
  toast("A imagem não vai pelo link: clique na miniatura, use Baixar arte e anexe na conversa.");return true}
-function pedirVal(p){if(!waVal(p.cliente,p.tel||"",p.num))return;if(!p.aprov||["pendente","ajustes"].includes(p.aprov.estado)){p.aprov={estado:"enviada",por:"",data:"",nota:""};save();render()}}
-$("bVal").onclick=()=>{if(waVal($("cli").value.trim()||"cliente",$("tel").value,edit&&edit.num)&&["pendente","ajustes"].includes($("aps").value))$("aps").value="enviada"};
+function pedirVal(p){const v=valorSinal(p);let sn=0;if(v>0&&confirm("Pedir também "+RCFG().sinal+"% de sinal ("+R(v)+") na mensagem?"))sn=v;if(!waVal(p.cliente,p.tel||"",p.num,sn))return;if(sn){p.sinal={valor:sn,data:hoje()};save();render()}if(!p.aprov||["pendente","ajustes"].includes(p.aprov.estado)){p.aprov={estado:"enviada",por:"",data:"",nota:""};save();render()}}
+$("bVal").onclick=()=>{const sn=$("sinalChk").checked?valorSinalForm():0;if(sn){if(edit)edit.sinal={valor:sn,data:hoje()};else snNovo=sn}if(waVal($("cli").value.trim()||"cliente",$("tel").value,edit&&edit.num,sn)&&["pendente","ajustes"].includes($("aps").value))$("aps").value="enviada"};
 $("bOk").onclick=()=>{$("aps").value="aprovada";if(!$("apd").value)$("apd").value=hoje();if(!$("app").value)$("app").value=$("cli").value};
 function findArt(id){for(const p of D.pedidos)for(const a of p.artes||[])if(a.id==id)return a;return curArts.find(a=>a.id==id)}
 async function abrirArte(id){const a=findArt(id);if(!a)return;const u=await url(id);if(!u){toast("Arquivo da arte não encontrado neste navegador.");return}
@@ -547,7 +549,7 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden&&(!SITE.qu
 if(SITE.dados)applySite(SITE.dados,SITE.base||siteBase());
 
 /* ===== Recibo: ao terminar a produção (pedido "Pronto"), abre o recibo para mandar pelo WhatsApp ===== */
-const RCFG=()=>Object.assign({pix:"",tit:"",out:"Cartão de crédito ou débito (na retirada)\nDinheiro (na retirada)",msg:"Obrigada pela preferência! 💖"},D.recibo||{});
+const RCFG=()=>Object.assign({pix:"",tit:"",out:"Cartão de crédito ou débito (na retirada)\nDinheiro (na retirada)",msg:"Obrigada pela preferência! 💖",sinal:50},D.recibo||{});
 let recP=null;
 function linhasRecibo(p){const c=RCFG(),L=[];
  L.push("🧾 *RECIBO • Sublimaê Artes Personalizadas*","Pedido #"+p.num+" • "+new Date().toLocaleDateString("pt-BR"),"Cliente: "+p.cliente,"");
@@ -583,11 +585,11 @@ async function desenharRecibo(p){const cv=$("rec-c"),x=cv.getContext("2d"),W=720
  y+=M-10;const H=y;
  cv.width=W*2;cv.height=H*2;cv.style.width=W+"px";x.setTransform(2,0,0,2,0,0);x.fillStyle="#fff";x.fillRect(0,0,W,H);x.textBaseline="alphabetic";ops.forEach(([f,yy])=>f(yy+M-10))}
 function abrirRecibo(p){recP=p;const c=RCFG();$("rec-t").textContent="Recibo do pedido #"+p.num+" • "+p.cliente;
- $("rc-pix").value=c.pix;$("rc-tit").value=c.tit;$("rc-out").value=c.out;$("rc-msg").value=c.msg;$("rec-cfg").open=!c.pix&&!D.recibo;
+ $("rc-pix").value=c.pix;$("rc-tit").value=c.tit;$("rc-out").value=c.out;$("rc-msg").value=c.msg;$("rc-sin").value=c.sinal;$("rec-cfg").open=!c.pix&&!D.recibo;
  $("rec-wa").textContent=p.tel?"Enviar pelo WhatsApp":"Enviar pelo WhatsApp (sem número)";
  if(!$("drec").open)$("drec").showModal();desenharRecibo(p)}
 function marcarRecibo(){if(!recP)return;recP.recibo={data:new Date().toISOString()};save();render()}
-$("rc-save").onclick=()=>{D.recibo={pix:$("rc-pix").value.trim(),tit:$("rc-tit").value.trim(),out:$("rc-out").value,msg:$("rc-msg").value.trim()};save();$("rec-cfg").open=false;if(recP)desenharRecibo(recP);toast("Formas de pagamento salvas.")};
+$("rc-save").onclick=()=>{D.recibo={pix:$("rc-pix").value.trim(),tit:$("rc-tit").value.trim(),out:$("rc-out").value,msg:$("rc-msg").value.trim(),sinal:Math.min(100,Math.max(0,+$("rc-sin").value||0))};save();$("rec-cfg").open=false;if(recP)desenharRecibo(recP);toast("Formas de pagamento salvas.")};
 $("rec-wa").onclick=()=>{const p=recP;if(!p)return;const d=(p.tel||"").replace(/\D/g,""),n=d?(d.length<=11?"55"+d:d):"";
  window.open("https://wa.me/"+n+"?text="+encodeURIComponent(linhasRecibo(p).join("\n")),"_blank");marcarRecibo()};
 const recBlob=()=>new Promise(ok=>$("rec-c").toBlob(ok,"image/png"));
@@ -695,6 +697,23 @@ document.addEventListener("visibilitychange",()=>{if(!document.hidden)nvAgendar(
 window.addEventListener("online",()=>nvAgendar(200));
 $("dlg").addEventListener("close",()=>{if(NV)nvAgendar(800)});
 setInterval(()=>{if(!document.hidden)nvSync()},60000);
+
+/* ===== Sinal antecipado na validação da arte ===== */
+let snNovo=0;
+$("dlg").addEventListener("close",()=>{if(snNovo&&salvo){const p=D.pedidos.reduce((a,b)=>b.id>a.id?b:a);if(p&&!p.sinal){p.sinal={valor:snNovo,data:hoje()};save();render()}}snNovo=0});
+const r2=n=>Math.round(n*100)/100;
+function valorSinal(p){const pc=RCFG().sinal||0;if(!pc)return 0;return Math.max(0,r2(tot(p)*pc/100-(+p.pago||0)))}
+function totForm(){const it=lerItens(),s=it.reduce((t,i)=>t+i.qtd*i.preco,0);return Math.max(0,s-(+$("des").value||0)+(+$("fre").value||0))}
+function valorSinalForm(){const pc=RCFG().sinal||0;return Math.max(0,r2(totForm()*pc/100-(+$("pag").value||0)))}
+function txtSinal(v){const c=RCFG();let t=`\n\nPara iniciar a produção, pedimos ${c.sinal}% do valor antecipado: *${R(v)}*.`;
+ if(c.pix)t+=`\nPIX: ${c.pix}${c.tit?" ("+c.tit+")":""}`;else setTimeout(()=>toast("Dica: cadastre a chave PIX no Recibo (Formas de pagamento) para ela ir junto na mensagem."),2500);
+ return t+"\nAssim que pagar, mande o comprovante por aqui, por favor."}
+function prepSinal(){const pc=RCFG().sinal||0,v=valorSinalForm();$("sinalTxt").textContent=pc+"% de sinal"+(v>0?" ("+R(v)+")":"");
+ $("sinalChk").closest("label").style.display=pc>0?"flex":"none";$("sinalChk").checked=pc>0&&v>0&&!(edit&&edit.sinal)}
+{const o0=open_;open_=function(p){o0(p);sinalMexeu=false;prepSinal()}}
+let sinalMexeu=false;$("sinalChk").addEventListener("change",()=>sinalMexeu=true);
+const reSinal=()=>{const ch=$("sinalChk").checked;prepSinal();if(sinalMexeu)$("sinalChk").checked=ch};
+$("itens").addEventListener("input",reSinal);["des","fre","pag"].forEach(id=>$(id).addEventListener("input",reSinal));
 
 vincularNovos();render();estadoSite();buscarSite(false);nvMostrar(NV?"sync":"");if(NV)nvSync();
 </script>
