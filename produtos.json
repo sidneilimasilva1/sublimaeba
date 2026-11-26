@@ -1,5 +1,5 @@
 {
- "atualizado": 1794702101070,
+ "atualizado": 1795724176268,
  "categorias": [
   "Política",
   "Calendário"
@@ -64,6 +64,16 @@
    "selo": "novo",
    "foto": "fotos/GRI-001-1794702098381.webp",
    "criado": 1794702101070
+  },
+  "PRO-001": {
+   "titulo": "Promoção BLACK FRIDAY",
+   "cat": "Personalizadas",
+   "preco": 60,
+   "precoTexto": "",
+   "desc": "Personalização conforme arte, nome, foto ou tema escolhido.",
+   "selo": "novo",
+   "foto": "fotos/PRO-001-1795724173159.webp",
+   "criado": 1795724176268
   }
  },
  "removidos": [
